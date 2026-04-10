@@ -35,10 +35,10 @@ public class UserController {
         User existingUser = userService.getUserById(id);
         if (existingUser == null) return null;
 
+        existingUser.setEmployeeNo(user.getEmployeeNo());
         existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
         existingUser.setLoginId(user.getLoginId());
-        existingUser.setPassword(user.getPassword());
         existingUser.setPhone(user.getPhone());
         existingUser.setOfficePhone(user.getOfficePhone());
         existingUser.setTeamId(user.getTeamId());

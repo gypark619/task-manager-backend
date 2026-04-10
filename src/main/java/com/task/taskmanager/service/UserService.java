@@ -3,6 +3,7 @@ package com.task.taskmanager.service;
 import com.task.taskmanager.entity.User;
 import com.task.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +13,10 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User register(User user) {
+        user.setPassword(passwordEncoder.encode(user.getEmployeeNo()));
         return userRepository.save(user);
     }
 
@@ -31,6 +34,10 @@ public class UserService {
 
     public User updateUser(User user) {
         return userRepository.save(user);
+    }
+
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 
     public void deleteUser(Long id) {
