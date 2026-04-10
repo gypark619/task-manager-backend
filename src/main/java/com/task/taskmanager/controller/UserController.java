@@ -4,6 +4,7 @@ import com.task.taskmanager.entity.User;
 import com.task.taskmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -26,14 +27,22 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         User existingUser = userService.getUserById(id);
-        if (existingUser == null) return null;
+        if (existingUser == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         existingUser.setEmployeeNo(user.getEmployeeNo());
         existingUser.setName(user.getName());
@@ -45,11 +54,18 @@ public class UserController {
         existingUser.setPositionId(user.getPositionId());
         existingUser.setStatus(user.getStatus());
 
-        return userService.updateUser(existingUser);
+        return ResponseEntity.ok(userService.updateUser(existingUser));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 }

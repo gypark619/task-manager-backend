@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -24,6 +25,7 @@ public class User {
     @Column(name = "login_id", nullable = false, unique = true)
     private String loginId;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
