@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 @Service
@@ -22,6 +25,16 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Page<User> searchUsers(
+            String name,
+            Long teamId,
+            Long positionId,
+            User.Status status,
+            Pageable pageable
+    ) {
+        return userRepository.searchUsers(name, teamId, positionId, status, pageable);
     }
 
     public User getUserById(Long id) {

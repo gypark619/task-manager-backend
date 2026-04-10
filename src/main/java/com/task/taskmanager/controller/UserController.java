@@ -6,6 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 @RestController
@@ -22,8 +26,16 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public Page<User> getUsers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long teamId,
+            @RequestParam(required = false) Long positionId,
+            @RequestParam(required = false) User.Status status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.searchUsers(name, teamId, positionId, status, pageable);
     }
 
     @GetMapping("/{id}")
