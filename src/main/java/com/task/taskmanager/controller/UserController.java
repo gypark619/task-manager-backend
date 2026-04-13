@@ -1,5 +1,7 @@
 package com.task.taskmanager.controller;
 
+import com.task.taskmanager.dto.PageResponse;
+import com.task.taskmanager.dto.UserResponse;
 import com.task.taskmanager.entity.User;
 import com.task.taskmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -26,16 +29,34 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<User> getUsers(
+    public PageResponse<UserResponse> getUsers(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long teamId,
             @RequestParam(required = false) Long positionId,
             @RequestParam(required = false) User.Status status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "userId") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDirection
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return userService.searchUsers(name, teamId, positionId, status, pageable);
+        Sort sort = sortDirection.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<User> result = userService.searchUsers(name, teamId, positionId, status, pageable);
+
+        List<UserResponse> content = result.getContent().stream()
+                .map(UserResponse::from)
+                .toList();
+
+        return new PageResponse<>(
+                content,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
     }
 
     @GetMapping("/{id}")
