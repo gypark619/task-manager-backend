@@ -1,13 +1,15 @@
 package com.task.taskmanager.controller;
 
-import com.task.taskmanager.entity.Team;
+import com.task.taskmanager.dto.common.PageResponse;
+import com.task.taskmanager.dto.team.TeamCreateRequest;
+import com.task.taskmanager.dto.team.TeamResponse;
+import com.task.taskmanager.dto.team.TeamUpdateRequest;
 import com.task.taskmanager.service.TeamService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,27 +22,47 @@ public class TeamController {
 
     private final TeamService teamService;
 
-    @GetMapping
-    public ResponseEntity<Page<Team>> getTeams (
-            @RequestParam(required = false, defaultValue = "") String teamName,
-            @RequestParam(required = false, defaultValue = "") String useYn,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<Team> result = teamService.getTeams(teamName, useYn, pageable);
-
-        return ResponseEntity.ok(result);
+    @PostMapping
+    public ResponseEntity<TeamResponse> register(@RequestBody TeamCreateRequest request) {
+        return ResponseEntity.ok(teamService.register(request));
     }
 
-    @PostMapping
-    public ResponseEntity<Team> saveTeam(@RequestBody Team team) {
-        return ResponseEntity.ok(teamService.saveTeam(team));
+    @GetMapping
+    public ResponseEntity<PageResponse<TeamResponse>> getTeams (
+            @RequestParam(required = false) String teamName,
+            @RequestParam(required = false) String useYn,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "teamId") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
+        Sort sort = sortDirection.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return ResponseEntity.ok(
+                teamService.getTeams(teamName, useYn, pageable)
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TeamResponse> getTeamById(@PathVariable Long id) {
+        return ResponseEntity.ok(teamService.getTeamById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TeamResponse> updateTeam(
+            @PathVariable Long id,
+            @RequestBody TeamUpdateRequest request
+    ) {
+        return ResponseEntity.ok(teamService.updateTeam(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTeam(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
         teamService.deleteTeam(id);
+        return ResponseEntity.ok().build();
     }
 }
