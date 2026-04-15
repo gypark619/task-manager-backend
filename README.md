@@ -95,6 +95,14 @@ DELETE /users/{userId}
 
 ---
 
+## 🔐 보안
+
+- DB 계정 정보 등 민감한 설정은 `application-local.properties`로 분리하여 관리합니다.
+- 해당 파일은 `.gitignore`에 포함되어 버전 관리에서 제외됩니다.
+- 초기 개발 과정에서 발생한 보안 이슈를 개선하여 환경 분리 구조를 적용하였습니다.
+
+---
+
 ## ⚙️ Run
 
 ```bash
