@@ -7,6 +7,10 @@ import com.task.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.task.taskmanager.dto.user.UserCreateRequest;
+import com.task.taskmanager.dto.user.UserUpdateRequest;
+import com.task.taskmanager.dto.user.UserResponse;
+import com.task.taskmanager.dto.common.PageResponse;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,64 +24,75 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User register(User user) {
-        user.setPassword(passwordEncoder.encode(user.getEmployeeNo()));
-        return userRepository.save(user);
+    public UserResponse register(UserCreateRequest request) {
+        User user = new User();
+        user.setEmployeeNo(request.getEmployeeNo());
+        user.setLoginId(request.getLoginId());
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setOfficePhone(request.getOfficePhone());
+        user.setTeamId(request.getTeamId());
+        user.setPositionId(request.getPositionId());
+        user.setStatus(request.getStatus() != null ? request.getStatus() : User.Status.ACTIVE);
+
+        user.setPassword(passwordEncoder.encode(request.getEmployeeNo()));
+
+        User savedUser = userRepository.save(user);
+        return UserResponse.from(savedUser);
     }
 
-    public Page<User> searchUsers(
+    public PageResponse<UserResponse> getUsers(
             String name,
             Long teamId,
             Long positionId,
             User.Status status,
             Pageable pageable
     ) {
-        return userRepository.searchUsers(name, teamId, positionId, status, pageable);
+        Page<User> result = userRepository.searchUsers(name, teamId, positionId, status, pageable);
+
+        return new PageResponse<>(
+                result.getContent().stream()
+                        .map(UserResponse::from)
+                        .toList(),
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
     }
 
-    public User getUserById(Long userId) {
+    public UserResponse getUserById(Long userId) {
+        User user = findUser(userId);
+        return UserResponse.from(user);
+    }
+
+    public UserResponse updateUser(Long userId, UserUpdateRequest request) {
+        User user = findUser(userId);
+
+        user.setEmployeeNo(request.getEmployeeNo());
+        user.setLoginId(request.getLoginId());
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setOfficePhone(request.getOfficePhone());
+        user.setTeamId(request.getTeamId());
+        user.setPositionId(request.getPositionId());
+        user.setStatus(request.getStatus());
+
+        User updatedUser = userRepository.save(user);
+        return UserResponse.from(updatedUser);
+    }
+
+    public void deleteUser(Long userId) {
+        User user = findUser(userId);
+        userRepository.delete(user);
+    }
+
+    private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(
                         ErrorCode.DATA_NOT_FOUND,
                         "사용자를 찾을 수 없습니다."
                 ));
-    }
-
-    public User getUserByLoginId(String loginId) {
-        return userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomException(
-                        ErrorCode.DATA_NOT_FOUND,
-                        "사용자를 찾을 수 없습니다."
-                ));
-    }
-
-    public User updateUser(User user) {
-        User existingUser = userRepository.findById(user.getUserId())
-                .orElseThrow(() -> new CustomException(
-                        ErrorCode.DATA_NOT_FOUND,
-                        "수정할 사용자를 찾을 수 없습니다."
-                ));
-
-        existingUser.setEmployeeNo(user.getEmployeeNo());
-        existingUser.setLoginId(user.getLoginId());
-        existingUser.setName(user.getName());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setOfficePhone(user.getOfficePhone());
-        existingUser.setTeamId(user.getTeamId());
-        existingUser.setPositionId(user.getPositionId());
-        existingUser.setStatus(user.getStatus());
-
-        return userRepository.save(existingUser);
-    }
-
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(
-                        ErrorCode.DATA_NOT_FOUND,
-                        "삭제할 사용자를 찾을 수 없습니다."
-                ));
-
-        userRepository.delete(user);
     }
 }

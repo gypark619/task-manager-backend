@@ -1,6 +1,6 @@
 package com.task.taskmanager.exception;
 
-import com.task.taskmanager.dto.ErrorResponse;
+import com.task.taskmanager.dto.common.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

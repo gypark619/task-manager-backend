@@ -1,7 +1,9 @@
 package com.task.taskmanager.controller;
 
-import com.task.taskmanager.dto.PageResponse;
-import com.task.taskmanager.dto.UserResponse;
+import com.task.taskmanager.dto.common.PageResponse;
+import com.task.taskmanager.dto.user.UserCreateRequest;
+import com.task.taskmanager.dto.user.UserResponse;
+import com.task.taskmanager.dto.user.UserUpdateRequest;
 import com.task.taskmanager.entity.User;
 import com.task.taskmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +26,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User register(@RequestBody User user) {
-        return userService.register(user);
+    public ResponseEntity<UserResponse> register(@RequestBody UserCreateRequest request) {
+        return ResponseEntity.ok(userService.register(request));
     }
 
     @GetMapping
-    public PageResponse<UserResponse> getUsers(
+    public ResponseEntity<PageResponse<UserResponse>> getUsers(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long teamId,
             @RequestParam(required = false) Long positionId,
@@ -45,59 +47,26 @@ public class UserController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<User> result = userService.searchUsers(name, teamId, positionId, status, pageable);
-
-        List<UserResponse> content = result.getContent().stream()
-                .map(UserResponse::from)
-                .toList();
-
-        return new PageResponse<>(
-                content,
-                result.getTotalPages(),
-                result.getTotalElements(),
-                result.getNumber()
+        return ResponseEntity.ok(
+                userService.getUsers(name, teamId, positionId, status, pageable)
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User existingUser = userService.getUserById(id);
-        if (existingUser == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        existingUser.setEmployeeNo(user.getEmployeeNo());
-        existingUser.setName(user.getName());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setLoginId(user.getLoginId());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setOfficePhone(user.getOfficePhone());
-        existingUser.setTeamId(user.getTeamId());
-        existingUser.setPositionId(user.getPositionId());
-        existingUser.setStatus(user.getStatus());
-
-        return ResponseEntity.ok(userService.updateUser(existingUser));
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable Long id,
+            @RequestBody UserUpdateRequest request
+    ) {
+        return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }

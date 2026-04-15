@@ -1,4 +1,4 @@
-package com.task.taskmanager.dto;
+package com.task.taskmanager.dto.user;
 
 import com.task.taskmanager.entity.User;
 import lombok.Getter;
