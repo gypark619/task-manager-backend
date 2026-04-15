@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         SELECT u
         FROM User u
         WHERE (:name IS NULL OR :name = '' OR u.name LIKE %:name%)
-          AND (:teamId IS NULL OR u.teamId = :teamId)
+          AND (:teamId IS NULL OR u.team.teamId = :teamId)
           AND (:positionId IS NULL OR u.positionId = :positionId)
           AND (:status IS NULL OR u.status = :status)
     """)

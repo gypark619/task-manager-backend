@@ -40,8 +40,9 @@ public class User {
     @Column(name = "office_phone")
     private String officePhone;
 
-    @Column(name = "team_id")
-    private Long teamId;
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @Column(name = "position_id")
     private Long positionId;

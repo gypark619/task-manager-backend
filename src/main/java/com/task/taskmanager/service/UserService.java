@@ -1,8 +1,10 @@
 package com.task.taskmanager.service;
 
+import com.task.taskmanager.entity.Team;
 import com.task.taskmanager.entity.User;
 import com.task.taskmanager.exception.CustomException;
 import com.task.taskmanager.exception.ErrorCode;
+import com.task.taskmanager.repository.TeamRepository;
 import com.task.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TeamRepository teamRepository;
 
     public UserResponse register(UserCreateRequest request) {
         User user = new User();
@@ -32,7 +35,11 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setOfficePhone(request.getOfficePhone());
-        user.setTeamId(request.getTeamId());
+
+        Team team = teamRepository.findById(request.getTeamId())
+                .orElse(null);
+        user.setTeam(team);
+
         user.setPositionId(request.getPositionId());
         user.setStatus(request.getStatus() != null ? request.getStatus() : User.Status.ACTIVE);
 
@@ -75,7 +82,11 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setOfficePhone(request.getOfficePhone());
-        user.setTeamId(request.getTeamId());
+
+        Team team = teamRepository.findById(request.getTeamId())
+                .orElse(null);
+        user.setTeam(team);
+
         user.setPositionId(request.getPositionId());
         user.setStatus(request.getStatus());
 
