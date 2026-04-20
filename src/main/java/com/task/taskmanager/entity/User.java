@@ -44,8 +44,9 @@ public class User {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @Column(name = "position_id")
-    private Long positionId;
+    @ManyToOne
+    @JoinColumn(name = "position_id")
+    private Position position;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;

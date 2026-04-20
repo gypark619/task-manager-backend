@@ -1,9 +1,11 @@
 package com.task.taskmanager.service;
 
+import com.task.taskmanager.entity.Position;
 import com.task.taskmanager.entity.Team;
 import com.task.taskmanager.entity.User;
 import com.task.taskmanager.exception.CustomException;
 import com.task.taskmanager.exception.ErrorCode;
+import com.task.taskmanager.repository.PositionRepository;
 import com.task.taskmanager.repository.TeamRepository;
 import com.task.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,6 @@ import com.task.taskmanager.dto.common.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -26,7 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TeamRepository teamRepository;
-
+    private final PositionRepository positionRepository;
     public UserResponse register(UserCreateRequest request) {
         User user = new User();
         user.setEmployeeNo(request.getEmployeeNo());
@@ -40,7 +40,10 @@ public class UserService {
                 .orElse(null);
         user.setTeam(team);
 
-        user.setPositionId(request.getPositionId());
+        Position position = positionRepository.findById(request.getPositionId())
+                .orElse(null);
+        user.setPosition(position);
+
         user.setStatus(request.getStatus() != null ? request.getStatus() : User.Status.ACTIVE);
 
         user.setPassword(passwordEncoder.encode(request.getEmployeeNo()));
@@ -87,7 +90,10 @@ public class UserService {
                 .orElse(null);
         user.setTeam(team);
 
-        user.setPositionId(request.getPositionId());
+        Position position = positionRepository.findById(request.getPositionId())
+                .orElse(null);
+        user.setPosition(position);
+
         user.setStatus(request.getStatus());
 
         User updatedUser = userRepository.save(user);

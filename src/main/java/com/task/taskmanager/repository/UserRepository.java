@@ -8,19 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    Optional<User> findByLoginId(String loginId);
-
     @Query("""
         SELECT u
         FROM User u
         WHERE (:name IS NULL OR :name = '' OR u.name LIKE %:name%)
           AND (:teamId IS NULL OR u.team.teamId = :teamId)
-          AND (:positionId IS NULL OR u.positionId = :positionId)
+          AND (:positionId IS NULL OR u.position.positionId = :positionId)
           AND (:status IS NULL OR u.status = :status)
     """)
     Page<User> searchUsers(

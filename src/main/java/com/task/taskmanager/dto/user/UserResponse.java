@@ -1,9 +1,6 @@
 package com.task.taskmanager.dto.user;
 
-import com.task.taskmanager.entity.Team;
 import com.task.taskmanager.entity.User;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
 @Getter
@@ -57,23 +54,13 @@ public class UserResponse {
                 user.getTeam() != null ? user.getTeam().getTeamId() : null,
                 user.getTeam() != null ? user.getTeam().getTeamName() : "",
 
-                user.getPositionId(),
-                getPositionName(user.getPositionId()),
+                // position
+                user.getPosition() != null ? user.getPosition().getPositionId() : null,
+                user.getPosition() != null ? user.getPosition().getPositionName() : "",
+
                 user.getStatus().name(),
                 getStatusName(user.getStatus())
         );
-    }
-
-    private static String getPositionName(Long positionId) {
-        if (positionId == null) return "";
-
-        return switch (positionId.intValue()) {
-            case 1 -> "사원";
-            case 2 -> "대리";
-            case 3 -> "과장";
-            case 4 -> "부장";
-            default -> "";
-        };
     }
 
     private static String getStatusName(User.Status status) {
