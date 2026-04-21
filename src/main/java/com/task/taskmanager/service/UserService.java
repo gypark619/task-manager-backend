@@ -34,7 +34,11 @@ public class UserService {
         user.setEmployeeNo(request.getEmployeeNo());
         user.setLoginId(request.getLoginId());
         user.setName(request.getName());
-        user.setEmail(request.getEmail());
+
+        String email = request.getEmail();
+        validateEmail(email);
+        user.setEmail(email != null ? email.trim() : null);
+
         user.setPhone(request.getPhone());
         user.setOfficePhone(request.getOfficePhone());
 
@@ -90,7 +94,11 @@ public class UserService {
         user.setEmployeeNo(request.getEmployeeNo());
         user.setLoginId(request.getLoginId());
         user.setName(request.getName());
-        user.setEmail(request.getEmail());
+
+        String email = request.getEmail();
+        validateEmail(email);
+        user.setEmail(email != null ? email.trim() : null);
+
         user.setPhone(request.getPhone());
         user.setOfficePhone(request.getOfficePhone());
 
@@ -156,5 +164,21 @@ public class UserService {
                         ErrorCode.DATA_NOT_FOUND,
                         "권한을 찾을 수 없습니다."
                 ));
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return;
+        }
+
+        String trimmedEmail = email.trim();
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+
+        if (!trimmedEmail.matches(emailRegex)) {
+            throw new CustomException(
+                    ErrorCode.INVALID_INPUT,
+                    "이메일 형식이 올바르지 않습니다."
+            );
+        }
     }
 }
