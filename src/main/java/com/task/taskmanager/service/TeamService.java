@@ -11,15 +11,17 @@ import com.task.taskmanager.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import com.task.taskmanager.entity.User;
+import com.task.taskmanager.repository.UserRepository;
 
 import org.springframework.data.domain.Pageable;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class TeamService {
 
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
     public TeamResponse register(TeamCreateRequest request) {
         Team team = new Team();
@@ -29,7 +31,7 @@ public class TeamService {
         team.setUseYn(request.getUseYn());
 
         Team savedTeam = teamRepository.save(team);
-        return TeamResponse.from(savedTeam);
+        return toTeamResponse(savedTeam);
     }
 
     public PageResponse<TeamResponse> getTeams(
@@ -42,7 +44,7 @@ public class TeamService {
 
         return new PageResponse<>(
                 result.getContent().stream()
-                        .map(TeamResponse::from)
+                        .map(this::toTeamResponse)
                         .toList(),
                 result.getTotalPages(),
                 result.getTotalElements(),
@@ -52,7 +54,7 @@ public class TeamService {
 
     public TeamResponse getTeamById(Long teamId) {
         Team team = findTeam(teamId);
-        return TeamResponse.from(team);
+        return toTeamResponse(team);
     }
 
     public TeamResponse updateTeam(Long teamId, TeamUpdateRequest request) {
@@ -72,7 +74,7 @@ public class TeamService {
         System.out.println("before save");
         Team updateTeam = teamRepository.save(team);
         System.out.println("after save");
-        return TeamResponse.from(updateTeam);
+        return toTeamResponse(updateTeam);
     }
 
     public void deleteTeam(Long teamId) {
@@ -86,5 +88,20 @@ public class TeamService {
                         ErrorCode.DATA_NOT_FOUND,
                         "부서를 찾을 수 없습니다."
                 ));
+    }
+
+    private TeamResponse toTeamResponse(Team team) {
+        String teamLeaderEmployeeNo = "";
+        String teamLeaderName = "";
+
+        if (team.getTeamLeaderId() != null) {
+            User leader = userRepository.findById(team.getTeamLeaderId()).orElse(null);
+            if (leader != null) {
+                teamLeaderEmployeeNo = leader.getEmployeeNo();
+                teamLeaderName = leader.getName();
+            }
+        }
+
+        return TeamResponse.from(team, teamLeaderEmployeeNo, teamLeaderName);
     }
 }
