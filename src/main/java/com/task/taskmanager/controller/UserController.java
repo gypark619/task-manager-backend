@@ -68,4 +68,18 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}/roles")
+    public ResponseEntity<Void> saveUserRoles(
+            @PathVariable Long id,
+            @RequestBody List<Long> roleIds
+    ) {
+        userService.saveUserRoles(id, roleIds);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/roles")
+    public ResponseEntity<List<Long>> getUserRoles(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserRoleIds(id));
+    }
 }

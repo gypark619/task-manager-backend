@@ -1,13 +1,9 @@
 package com.task.taskmanager.service;
 
-import com.task.taskmanager.entity.Position;
-import com.task.taskmanager.entity.Team;
-import com.task.taskmanager.entity.User;
+import com.task.taskmanager.entity.*;
 import com.task.taskmanager.exception.CustomException;
 import com.task.taskmanager.exception.ErrorCode;
-import com.task.taskmanager.repository.PositionRepository;
-import com.task.taskmanager.repository.TeamRepository;
-import com.task.taskmanager.repository.UserRepository;
+import com.task.taskmanager.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +14,9 @@ import com.task.taskmanager.dto.common.PageResponse;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +26,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final TeamRepository teamRepository;
     private final PositionRepository positionRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+
     public UserResponse register(UserCreateRequest request) {
         User user = new User();
         user.setEmployeeNo(request.getEmployeeNo());
@@ -36,12 +38,18 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setOfficePhone(request.getOfficePhone());
 
-        Team team = teamRepository.findById(request.getTeamId())
-                .orElse(null);
+        Team team = null;
+        if (request.getTeamId() != null) {
+            team = teamRepository.findById(request.getTeamId())
+                    .orElse(null);
+        }
         user.setTeam(team);
 
-        Position position = positionRepository.findById(request.getPositionId())
-                .orElse(null);
+        Position position = null;
+        if (request.getPositionId() != null) {
+            position = positionRepository.findById(request.getPositionId())
+                    .orElse(null);
+        }
         user.setPosition(position);
 
         user.setStatus(request.getStatus() != null ? request.getStatus() : User.Status.ACTIVE);
@@ -86,12 +94,18 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setOfficePhone(request.getOfficePhone());
 
-        Team team = teamRepository.findById(request.getTeamId())
-                .orElse(null);
+        Team team = null;
+        if (request.getTeamId() != null) {
+            team = teamRepository.findById(request.getTeamId())
+                    .orElse(null);
+        }
         user.setTeam(team);
 
-        Position position = positionRepository.findById(request.getPositionId())
-                .orElse(null);
+        Position position = null;
+        if (request.getPositionId() != null) {
+            position = positionRepository.findById(request.getPositionId())
+                    .orElse(null);
+        }
         user.setPosition(position);
 
         user.setStatus(request.getStatus());
@@ -105,11 +119,42 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @Transactional
+    public void saveUserRoles(Long userId, List<Long> roleIds) {
+        User user = findUser(userId);
+
+        userRoleRepository.deleteByUserUserId(userId);
+
+        for (Long roleId : roleIds) {
+            Role role = findRole(roleId);
+
+            UserRole userRole = new UserRole();
+            userRole.setUser(user);
+            userRole.setRole(role);
+
+            userRoleRepository.save(userRole);
+        }
+    }
+
+    public List<Long> getUserRoleIds(Long userId) {
+        return userRoleRepository.findByUserUserId(userId).stream()
+                .map(userRole -> userRole.getRole().getRoleId())
+                .toList();
+    }
+
     private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(
                         ErrorCode.DATA_NOT_FOUND,
                         "사용자를 찾을 수 없습니다."
+                ));
+    }
+
+    private Role findRole(Long roleId) {
+        return roleRepository.findById(roleId)
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.DATA_NOT_FOUND,
+                        "권한을 찾을 수 없습니다."
                 ));
     }
 }
