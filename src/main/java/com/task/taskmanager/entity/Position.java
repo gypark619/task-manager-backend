@@ -19,13 +19,13 @@ public class Position {
     @Column(name = "position_id")
     private Long positionId;
 
-    @Column(name = "position_name")
+    @Column(name = "position_name", nullable = false)
     private String positionName;
 
-    @Column(name = "position_level")
+    @Column(name = "position_level", nullable = false)
     private Integer positionLevel;
 
-    @Column(name = "use_yn")
+    @Column(name = "use_yn", nullable = false, length = 1)
     private String useYn;
 
     @Column(name = "created_at")

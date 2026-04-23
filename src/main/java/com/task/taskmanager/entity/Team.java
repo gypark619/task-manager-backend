@@ -28,7 +28,7 @@ public class Team {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "use_yn", length = 1)
+    @Column(name = "use_yn", nullable = false, length = 1)
     private String useYn;
 
     @Column(name = "created_at")

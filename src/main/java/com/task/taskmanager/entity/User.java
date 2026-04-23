@@ -26,15 +26,16 @@ public class User {
     private String loginId;
 
     @JsonIgnore
-    @Column(nullable = false)
+    @Column(name = "password",nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "name",nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(name = "email")
     private String email;
 
+    @Column(name = "phone")
     private String phone;
 
     @Column(name = "office_phone")
@@ -49,6 +50,7 @@ public class User {
     private Position position;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private Status status = Status.ACTIVE;
 
     @Column(name = "created_at")
