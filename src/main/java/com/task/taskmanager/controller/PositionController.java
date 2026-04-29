@@ -20,12 +20,12 @@ public class PositionController {
 
     @GetMapping
     public ResponseEntity<PageResponse<Position>> getPositions(
-            @RequestParam(required = false) String positionName,
-            @RequestParam(required = false) String useYn,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "positionId") String sortField,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(name = "positionName", required = false) String positionName,
+            @RequestParam(name = "useYn", required = false) String useYn,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortField", defaultValue = "positionId") String sortField,
+            @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection
     ) {
         Sort sort = sortDirection.equalsIgnoreCase("asc")
                 ? Sort.by(sortField).ascending()
@@ -39,7 +39,7 @@ public class PositionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Position> getPosition(@PathVariable Long id) {
+    public ResponseEntity<Position> getPosition(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(positionService.getPosition(id));
     }
 
@@ -52,7 +52,7 @@ public class PositionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Position> update(
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody Position position
     ) {
         position.setPositionId(id);
@@ -62,7 +62,7 @@ public class PositionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable(name = "id") Long id) {
         positionService.delete(id);
         return ResponseEntity.ok().build();
     }

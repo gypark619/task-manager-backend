@@ -20,11 +20,11 @@ public class RoleController {
 
     @GetMapping
     public ResponseEntity<PageResponse<Role>> getRoles(
-            @RequestParam(required = false) String roleName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "roleId") String sortField,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(name = "roleName", required = false) String roleName,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortField", defaultValue = "roleId") String sortField,
+            @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection
     ) {
         Sort sort = sortDirection.equalsIgnoreCase("asc")
                 ? Sort.by(sortField).ascending()
@@ -38,7 +38,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Role> getRole(@PathVariable Long id) {
+    public ResponseEntity<Role> getRole(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(roleService.getRole(id));
     }
 
@@ -51,7 +51,7 @@ public class RoleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Role> update(
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody Role role
     ) {
         role.setRoleId(id);
@@ -61,7 +61,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable(name = "id") Long id) {
         roleService.delete(id);
         return ResponseEntity.ok().build();
     }

@@ -28,16 +28,16 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<PageResponse<TaskResponse>> getTasks(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) Long statusId,
-            @RequestParam(required = false) Long teamId,
-            @RequestParam(required = false) Long assigneeId,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate dueDate,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "taskId") String sortField,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "statusId", required = false) Long statusId,
+            @RequestParam(name = "teamId", required = false) Long teamId,
+            @RequestParam(name = "assigneeId", required = false) Long assigneeId,
+            @RequestParam(name = "startDate", required = false) LocalDate startDate,
+            @RequestParam(name = "dueDate", required = false) LocalDate dueDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortField", defaultValue = "taskId") String sortField,
+            @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection
     ) {
         Sort sort = sortDirection.equalsIgnoreCase("asc")
                 ? Sort.by(sortField).ascending()
@@ -51,13 +51,13 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(taskService.getTaskById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody Task task
     ) {
         task.setTaskId(id);
@@ -65,7 +65,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable(name = "id") Long id) {
         taskService.delete(id);
         return ResponseEntity.ok().build();
     }

@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/teams")
@@ -29,12 +28,12 @@ public class TeamController {
 
     @GetMapping
     public ResponseEntity<PageResponse<TeamResponse>> getTeams (
-            @RequestParam(required = false) String teamName,
-            @RequestParam(required = false) String useYn,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "teamId") String sortField,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(name = "teamName", required = false) String teamName,
+            @RequestParam(name = "useYn", required = false) String useYn,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortField", defaultValue = "teamId") String sortField,
+            @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection
     ) {
         Sort sort = sortDirection.equalsIgnoreCase("asc")
                 ? Sort.by(sortField).ascending()
@@ -48,20 +47,20 @@ public class TeamController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TeamResponse> getTeamById(@PathVariable Long id) {
+    public ResponseEntity<TeamResponse> getTeamById(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(teamService.getTeamById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TeamResponse> updateTeam(
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody TeamUpdateRequest request
     ) {
         return ResponseEntity.ok(teamService.updateTeam(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTeam(@PathVariable(name = "id") Long id) {
         teamService.deleteTeam(id);
         return ResponseEntity.ok().build();
     }

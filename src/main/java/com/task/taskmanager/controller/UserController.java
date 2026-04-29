@@ -30,14 +30,14 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<PageResponse<UserResponse>> getUsers(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Long teamId,
-            @RequestParam(required = false) Long positionId,
-            @RequestParam(required = false) User.Status status,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "userId") String sortField,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "teamId", required = false) Long teamId,
+            @RequestParam(name = "positionId", required = false) Long positionId,
+            @RequestParam(name = "status", required = false) User.Status status,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortField", defaultValue = "userId") String sortField,
+            @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection
     ) {
         Sort sort = sortDirection.equalsIgnoreCase("asc")
                 ? Sort.by(sortField).ascending()
@@ -51,27 +51,27 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody UserUpdateRequest request
     ) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable(name = "id") Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/roles")
     public ResponseEntity<Void> saveUserRoles(
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody List<Long> roleIds
     ) {
         userService.saveUserRoles(id, roleIds);
@@ -79,7 +79,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/roles")
-    public ResponseEntity<List<Long>> getUserRoles(@PathVariable Long id) {
+    public ResponseEntity<List<Long>> getUserRoles(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(userService.getUserRoleIds(id));
     }
 }
